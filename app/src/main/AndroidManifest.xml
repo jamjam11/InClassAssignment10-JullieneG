@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="julliene.inclassassignment10_jullieneg">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,13 +28,26 @@
             android:parentActivityName=".MainActivity"/>
         <activity android:name=".ListActivity"
             android:label="Read BlogPosts"
-            android:parentActivityName=".ListActivity"/>
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".CameraActivity"
             android:label="Camera"
-            android:parentActivityName=".CameraActivity"/>
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".StorageActivity"
             android:label="Load Images"
             android:parentActivityName=".MainActivity"></activity>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="julliene.inclassassignment10_jullieneg"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+
     </application>
+
+
 
 </manifest>
