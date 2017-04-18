@@ -1,8 +1,6 @@
 package julliene.inclassassignment10_jullieneg;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,9 +17,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,6 +32,7 @@ public class CameraActivity extends AppCompatActivity {
     private ImageView imageView;
     private File photoFile;
     private StorageReference mStorageRef;
+    private Uri fileToUpload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +45,12 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void takePhoto(View view) {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
-        if (intent.resolveActivity(getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
 
-            startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
@@ -62,8 +61,8 @@ public class CameraActivity extends AppCompatActivity {
                 Uri photoURI = FileProvider.getUriForFile(this,
                         "julliene.inclassassignment10_jullieneg",
                         photoFile);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
     }
@@ -95,55 +94,26 @@ public class CameraActivity extends AppCompatActivity {
             return;
 
         if (requestCode == REQUEST_TAKE_PHOTO) {
-            try {
-                decodeUri(Uri.parse(photoFile.toURI().toString()));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+                fileToUpload = Uri.parse(photoFile.toURI().toString());
+
         } else if (requestCode == REQUEST_PICK_PHOTO) {
-            try {
-                decodeUri(data.getData());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+                fileToUpload = data.getData();
         }
-    }
 
-    public void decodeUri(Uri uri) throws FileNotFoundException {
-
-        // Get the dimensions of the View
-        int targetW = imageView.getWidth();
-        int targetH = imageView.getHeight();
-
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        // I just want to know the dimension, don't pass me the pixels yet!
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(getContentResolver().openInputStream(uri), null, bmOptions);
-
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-
-        Bitmap image = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri), null, bmOptions);
-        imageView.setImageBitmap(image);
+        Picasso.with(this)
+                .load(fileToUpload)
+                .resize(imageView.getWidth(), imageView.getHeight())
+                .centerCrop()
+                .into(imageView);
     }
 
     public void uploadPhoto(View view) {
-        Uri file = Uri.fromFile(new File("path/to/Photos.jpg"));
 
-        StorageReference filePath = mStorageRef.child("Photos").child(file.getLastPathSegment());
+        StorageReference filePath = mStorageRef.child("images/upload.jpg");
 
-        filePath.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+       filePath.putFile(fileToUpload).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
                 Toast.makeText(CameraActivity.this, "Upload Done", Toast.LENGTH_SHORT).show();
             }
         })
@@ -152,6 +122,7 @@ public class CameraActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
                         // ...
+                        Toast.makeText(CameraActivity.this, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
