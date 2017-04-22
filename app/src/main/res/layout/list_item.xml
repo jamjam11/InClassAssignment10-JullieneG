@@ -5,27 +5,28 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp"
-    android:background="#bdbdbd">
+    android:background="#E0E0E0">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/title"
-        android:textColor="#1f6a8c"
-        android:textSize="18sp"/>
+        android:textColor="#1565C0"
+        android:textSize="22sp"
+        android:clickable="true"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/time"
-        android:textColor="#1f6a8c"
-        android:textSize="18sp"/>
+        android:textColor="#9E9E9E"
+        android:textSize="14sp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/body"
-        android:textColor="#1f6a8c"
+        android:textColor="#424242"
         android:textSize="18sp"/>
 
 </LinearLayout>

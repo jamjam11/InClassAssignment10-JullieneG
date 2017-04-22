@@ -1,12 +1,13 @@
 package julliene.inclassassignment10_jullieneg;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 /**
  * Created by xo on 4/11/17.
  */
 
-public class BlogPost {
+public class BlogPost implements Serializable {
     String title;
     String body;
     String time;
